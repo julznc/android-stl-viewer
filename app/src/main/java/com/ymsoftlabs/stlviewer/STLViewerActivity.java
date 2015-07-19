@@ -8,10 +8,17 @@ import android.view.MenuItem;
 
 public class STLViewerActivity extends ActionBarActivity {
 
+    private GLView mGLView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_stlviewer);
+        //setContentView(R.layout.activity_stlviewer);
+
+        // create gl surface view instance
+        mGLView = new GLView(this);
+        // set as the content view for this activity
+        setContentView(mGLView);
     }
 
     @Override
