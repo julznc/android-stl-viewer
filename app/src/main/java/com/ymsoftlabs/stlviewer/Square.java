@@ -1,5 +1,7 @@
 package com.ymsoftlabs.stlviewer;
 
+import android.opengl.GLES20;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -8,6 +10,21 @@ import java.nio.ShortBuffer;
 public class Square {
     private FloatBuffer vertexBuffer;
     private ShortBuffer drawListBuffer;
+
+    private final String vertexShaderCode =
+            "uniform mat4 uMVPMatrix;" +
+                    "attribute vec4 vPosition;" +
+                    "void main() {" +
+                    "  gl_Position = uMVPMatrix * vPosition;" +
+                    "}";
+    private final String fragmentShaderCode =
+            "precision mediump float;" +
+                    "uniform vec4 vColor;" +
+                    "void main() {" +
+                    "  gl_FragColor = vColor;" +
+                    "}";
+
+    private int mMVPMatrixHandle;
 
     // number of coordinates per vertex
     static final int COORDS_PER_VERTEX = 3;
@@ -19,6 +36,15 @@ public class Square {
     };
 
     private short drawOrder[] = { 0, 1, 2, 0, 2, 3 }; // order to draw vertices
+    // rgba color
+    float color[] = { 0.2f, 0.7f, 0.9f, 1.0f };
+
+    private final int mProgram;
+    private int mPositionHandle;
+    private int mColorHandle;
+
+    private final int vertexCount = squareCoords.length / COORDS_PER_VERTEX;
+    private final int vertexStride = COORDS_PER_VERTEX * 4; // x4 bytes
 
     public Square() {
         // vertex byte buffer for shape coordinates // 4bytes per float
@@ -34,5 +60,36 @@ public class Square {
         drawListBuffer = dlb.asShortBuffer();
         drawListBuffer.put(drawOrder);
         drawListBuffer.position(0);
+
+        int vertexShader = GLRenderer.loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
+        int fragmentShader = GLRenderer.loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
+
+        // create empty OpenGL ES Program
+        mProgram = GLES20.glCreateProgram();
+        GLES20.glAttachShader(mProgram, vertexShader);
+        GLES20.glAttachShader(mProgram, fragmentShader);
+        GLES20.glLinkProgram(mProgram);
+    }
+
+    public void draw(float[] mvpMatrix) {
+        GLES20.glUseProgram(mProgram);
+
+        mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
+        GLES20.glEnableVertexAttribArray(mPositionHandle);
+
+        GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX,
+                GLES20.GL_FLOAT, false, vertexStride, vertexBuffer);
+
+        mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
+        GLES20.glUniform4fv(mColorHandle, 1, color, 0);
+
+        mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
+
+        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);
+
+        GLES20.glDrawElements(GLES20.GL_TRIANGLES, drawOrder.length,
+                GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
+
+        GLES20.glDisableVertexAttribArray(mPositionHandle);
     }
 }

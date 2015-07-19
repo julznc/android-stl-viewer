@@ -59,6 +59,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
         Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
 
+        mSquare.draw(scratch);
         mTriangle.draw(scratch);
     }
 
