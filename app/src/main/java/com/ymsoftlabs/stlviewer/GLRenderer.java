@@ -17,6 +17,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
     private float[] mRotationMatrix = new float[16];
 
+    private volatile float mAngle;
+
     private Triangle mTriangle;
     private Square mSquare;
 
@@ -51,9 +53,9 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         // projection & view transformation
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
-        long time = SystemClock.uptimeMillis() % 4000L;
-        float angle = 0.090f * ((int)time);
-        Matrix.setRotateM(mRotationMatrix, 0, angle, 0, 0, -1.0f);
+        //long time = SystemClock.uptimeMillis() % 4000L;
+        //float angle = 0.090f * ((int)time);
+        Matrix.setRotateM(mRotationMatrix, 0, mAngle, 0, 0, -1.0f);
 
         Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
 
@@ -65,5 +67,13 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         GLES20.glShaderSource(shader, shaderCode);
         GLES20.glCompileShader(shader);
         return shader;
+    }
+
+    public float getAngle() {
+        return mAngle;
+    }
+
+    public void setAngle(float angle) {
+        mAngle = angle;
     }
 }
