@@ -19,16 +19,14 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
     private volatile float mAngle;
 
-    private Triangle mTriangle;
-    private Square mSquare;
+    private Cube mCube;
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         // background frame color
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-        mTriangle = new Triangle();
-        mSquare = new Square();
+        mCube = new Cube();
     }
 
     @Override
@@ -59,8 +57,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
         Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
 
-        mSquare.draw(scratch);
-        mTriangle.draw(scratch);
+        mCube.draw(scratch);
     }
 
     public static int loadShader(int type, String shaderCode) {
