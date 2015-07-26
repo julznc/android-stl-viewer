@@ -2,7 +2,9 @@ package com.ymsoftlabs.stlviewer;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
+import android.view.WindowManager;
 
 public class GLView extends GLSurfaceView{
 
@@ -11,9 +13,16 @@ public class GLView extends GLSurfaceView{
     private final float TOUCH_SCALE_FACTOR = 180.0f / 320;
     private float mPreviousX;
     private float mPreviousY;
+    private float mDensity;
 
     public GLView(Context context) {
         super(context);
+
+        final DisplayMetrics displayMetrics = new DisplayMetrics();
+        final WindowManager windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+        mDensity = displayMetrics.density;
+        //mDensity = context.getResources().getDisplayMetrics().density; // todo: try this
 
         // create opengl es 2.0 context
         setEGLContextClientVersion(2);
@@ -33,6 +42,7 @@ public class GLView extends GLSurfaceView{
 
         switch (e.getAction()) {
             case MotionEvent.ACTION_MOVE:
+                /*
                 float dx = x - mPreviousX;
                 float dy = y - mPreviousY;
 
@@ -46,6 +56,13 @@ public class GLView extends GLSurfaceView{
 
                 mRenderer.setAngle( mRenderer.getAngle() +
                         ((dx + dy) * TOUCH_SCALE_FACTOR));
+                */
+                float deltaX = (x - mPreviousX) / mDensity / 2f;
+                float deltaY = (y - mPreviousY) / mDensity / 2f;
+
+                mRenderer.mDeltaX += deltaX;
+                mRenderer.mDeltaY += deltaY;
+
                 requestRender();
         }
 

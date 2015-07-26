@@ -18,6 +18,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     private float[] mRotationMatrix = new float[16];
 
     private volatile float mAngle;
+    public volatile float mDeltaX = 0;
+    public volatile float mDeltaY = 0;
 
     private Cube mCube;
 
