@@ -15,7 +15,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.SimpleAdapter;
 
-import com.learnopengles.android.lesson1.LessonOneActivity;
 import com.learnopengles.android.lesson2.LessonTwoActivity;
 import com.learnopengles.android.lesson3.LessonThreeActivity;
 import com.learnopengles.android.lesson4.LessonFourActivity;
@@ -40,16 +39,7 @@ public class TableOfContents extends ListActivity
 		final SparseArray<Class<? extends Activity>> activityMapping = new SparseArray<Class<? extends Activity>>();
 		
 		int i = 0;
-		
-		{
-			final Map<String, Object> item = new HashMap<String, Object>();
-			item.put(ITEM_IMAGE, R.drawable.ic_lesson_one);
-			item.put(ITEM_TITLE, getText(R.string.lesson_one));
-			item.put(ITEM_SUBTITLE, getText(R.string.lesson_one_subtitle));
-			data.add(item);
-			activityMapping.put(i++, LessonOneActivity.class);			
-		}
-		
+
 		{
 			final Map<String, Object> item = new HashMap<String, Object>();
 			item.put(ITEM_IMAGE, R.drawable.ic_lesson_two);
