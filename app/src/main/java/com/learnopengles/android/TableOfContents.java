@@ -15,8 +15,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.SimpleAdapter;
 
-import com.learnopengles.android.lesson4.LessonFourActivity;
-import com.learnopengles.android.lesson5.LessonFiveActivity;
 import com.learnopengles.android.lesson6.LessonSixActivity;
 
 public class TableOfContents extends ListActivity 
@@ -38,24 +36,6 @@ public class TableOfContents extends ListActivity
 		
 		int i = 0;
 
-		{
-			final Map<String, Object> item = new HashMap<String, Object>();
-			item.put(ITEM_IMAGE, R.drawable.ic_lesson_four);
-			item.put(ITEM_TITLE, getText(R.string.lesson_four));
-			item.put(ITEM_SUBTITLE, getText(R.string.lesson_four_subtitle));
-			data.add(item);
-			activityMapping.put(i++, LessonFourActivity.class);
-		}
-		
-		{
-			final Map<String, Object> item = new HashMap<String, Object>();
-			item.put(ITEM_IMAGE, R.drawable.ic_lesson_five);
-			item.put(ITEM_TITLE, getText(R.string.lesson_five));
-			item.put(ITEM_SUBTITLE, getText(R.string.lesson_five_subtitle));
-			data.add(item);
-			activityMapping.put(i++, LessonFiveActivity.class);
-		}
-		
 		{
 			final Map<String, Object> item = new HashMap<String, Object>();
 			item.put(ITEM_IMAGE, R.drawable.ic_lesson_six);
