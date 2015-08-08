@@ -59,7 +59,6 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 	private final FloatBuffer mCubePositions;	
 	private final FloatBuffer mCubeNormals;
 	private final FloatBuffer mCubeTextureCoordinates;
-	private final FloatBuffer mCubeTextureCoordinatesForPlane;
 		
 	/** This will be used to pass in the transformation matrix. */
 	private int mMVPMatrixHandle;
@@ -280,63 +279,7 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 				1.0f, 1.0f,
 				1.0f, 0.0f
 		};	
-		
-		// S, T (or X, Y)
-		// Texture coordinate data.
-		// Because images have a Y axis pointing downward (values increase as you move down the image) while
-		// OpenGL has a Y axis pointing upward, we adjust for that here by flipping the Y axis.
-		// What's more is that the texture coordinates are the same for every face.
-		final float[] cubeTextureCoordinateDataForPlane =
-		{												
-				// Front face
-				0.0f, 0.0f, 				
-				0.0f, 25.0f,
-				25.0f, 0.0f,
-				0.0f, 25.0f,
-				25.0f, 25.0f,
-				25.0f, 0.0f,				
-				
-				// Right face 
-				0.0f, 0.0f, 				
-				0.0f, 25.0f,
-				25.0f, 0.0f,
-				0.0f, 25.0f,
-				25.0f, 25.0f,
-				25.0f, 0.0f,	
-				
-				// Back face 
-				0.0f, 0.0f, 				
-				0.0f, 25.0f,
-				25.0f, 0.0f,
-				0.0f, 25.0f,
-				25.0f, 25.0f,
-				25.0f, 0.0f,	
-				
-				// Left face 
-				0.0f, 0.0f, 				
-				0.0f, 25.0f,
-				25.0f, 0.0f,
-				0.0f, 25.0f,
-				25.0f, 25.0f,
-				25.0f, 0.0f,	
-				
-				// Top face 
-				0.0f, 0.0f, 				
-				0.0f, 25.0f,
-				25.0f, 0.0f,
-				0.0f, 25.0f,
-				25.0f, 25.0f,
-				25.0f, 0.0f,	
-				
-				// Bottom face 
-				0.0f, 0.0f, 				
-				0.0f, 25.0f,
-				25.0f, 0.0f,
-				0.0f, 25.0f,
-				25.0f, 25.0f,
-				25.0f, 0.0f
-		};	
-		
+
 		// Initialize the buffers.
 		mCubePositions = ByteBuffer.allocateDirect(cubePositionData.length * mBytesPerFloat)
         .order(ByteOrder.nativeOrder()).asFloatBuffer();							
@@ -349,10 +292,7 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 		mCubeTextureCoordinates = ByteBuffer.allocateDirect(cubeTextureCoordinateData.length * mBytesPerFloat)
 		.order(ByteOrder.nativeOrder()).asFloatBuffer();
 		mCubeTextureCoordinates.put(cubeTextureCoordinateData).position(0);
-		
-		mCubeTextureCoordinatesForPlane = ByteBuffer.allocateDirect(cubeTextureCoordinateDataForPlane.length * mBytesPerFloat)
-		.order(ByteOrder.nativeOrder()).asFloatBuffer();
-		mCubeTextureCoordinatesForPlane.put(cubeTextureCoordinateDataForPlane).position(0);
+
 	}
 	
 	@Override
