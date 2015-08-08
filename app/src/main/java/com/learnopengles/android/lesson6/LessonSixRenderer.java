@@ -299,7 +299,8 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
                 "    float diffuse = max(dot(v_Normal, lightVector), 0.0);" +
                 "    diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance)));" +
                 "    diffuse = diffuse + 0.7;" +
-                "    gl_FragColor = (diffuse * v_Color);" +
+                //"    gl_FragColor = (diffuse * v_Color);" +
+                "    gl_FragColor = (diffuse * vec4(0.596, 1.0, 0.596, 1.0));" +
                 "}";
 
         final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, vertexShader);
