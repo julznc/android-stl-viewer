@@ -14,7 +14,6 @@ import android.opengl.Matrix;
 
 import com.learnopengles.android.R;
 import com.learnopengles.android.common.ShaderHelper;
-import com.learnopengles.android.common.TextureHelper;
 
 /**
  * This class implements our custom renderer. Note that the GL10 parameter passed in is unused for OpenGL ES 2.0
@@ -58,16 +57,12 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 	private final FloatBuffer mCubePositions;	
 	private final FloatBuffer mCubeNormals;
 	private final FloatBuffer mCubeColors;
-	private final FloatBuffer mCubeTextureCoordinates;
 		
 	/** This will be used to pass in the transformation matrix. */
 	private int mMVPMatrixHandle;
 	
 	/** This will be used to pass in the modelview matrix. */
 	private int mMVMatrixHandle;
-
-	/** This will be used to pass in the texture. */
-	private int mTextureUniformHandle;
 
 	/** This will be used to pass in model position information. */
 	private int mPositionHandle;
@@ -76,9 +71,6 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 	private int mNormalHandle;
 
     private int mColorHandle;
-
-	/** This will be used to pass in model texture coordinate information. */
-	private int mTextureCoordinateHandle;
 
 	/** How many bytes per float. */
 	private final int mBytesPerFloat = 4;	
@@ -89,14 +81,8 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 	/** Size of the normal data in elements. */
 	private final int mNormalDataSize = 3;
 
-	/** Size of the texture coordinate data in elements. */
-	private final int mTextureCoordinateDataSize = 2;
-
 	/** This is a handle to our cube shading program. */
 	private int mProgramHandle;
-
-	/** These are handles to our texture data. */
-	private int mBrickDataHandle;
 
 	// These still work without volatile, but refreshes are not guaranteed to happen.					
 	public volatile float mDeltaX;					
@@ -222,62 +208,6 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 				0.0f, -1.0f, 0.0f,
 				0.0f, -1.0f, 0.0f
 		};
-		
-		// S, T (or X, Y)
-		// Texture coordinate data.
-		// Because images have a Y axis pointing downward (values increase as you move down the image) while
-		// OpenGL has a Y axis pointing upward, we adjust for that here by flipping the Y axis.
-		// What's more is that the texture coordinates are the same for every face.
-		final float[] cubeTextureCoordinateData =
-		{
-				// Front face
-				0.0f, 0.0f,
-				0.0f, 1.0f,
-				1.0f, 0.0f,
-				0.0f, 1.0f,
-				1.0f, 1.0f,
-				1.0f, 0.0f,
-
-				// Right face
-				0.0f, 0.0f,
-				0.0f, 1.0f,
-				1.0f, 0.0f,
-				0.0f, 1.0f,
-				1.0f, 1.0f,
-				1.0f, 0.0f,
-
-				// Back face
-				0.0f, 0.0f,
-				0.0f, 1.0f,
-				1.0f, 0.0f,
-				0.0f, 1.0f,
-				1.0f, 1.0f,
-				1.0f, 0.0f,
-
-				// Left face
-				0.0f, 0.0f,
-				0.0f, 1.0f,
-				1.0f, 0.0f,
-				0.0f, 1.0f,
-				1.0f, 1.0f,
-				1.0f, 0.0f,
-
-				// Top face
-				0.0f, 0.0f,
-				0.0f, 1.0f,
-				1.0f, 0.0f,
-				0.0f, 1.0f,
-				1.0f, 1.0f,
-				1.0f, 0.0f,
-
-				// Bottom face
-				0.0f, 0.0f,
-				0.0f, 1.0f,
-				1.0f, 0.0f,
-				0.0f, 1.0f,
-				1.0f, 1.0f,
-				1.0f, 0.0f
-		};
 
         // colors
         final float cubeColorData[] = {
@@ -303,11 +233,6 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
         mCubeColors = ByteBuffer.allocateDirect(cubeColorData.length * mBytesPerFloat)
         .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mCubeColors.put(cubeColorData).position(0);
-
-		mCubeTextureCoordinates = ByteBuffer.allocateDirect(cubeTextureCoordinateData.length * mBytesPerFloat)
-		.order(ByteOrder.nativeOrder()).asFloatBuffer();
-		mCubeTextureCoordinates.put(cubeTextureCoordinateData).position(0);
-
 	}
 	
 	@Override
@@ -352,15 +277,12 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 				"attribute vec4 a_Position;" +
 				"attribute vec3 a_Normal;" +
                 "attribute vec4 a_Color;" +
-				"attribute vec2 a_TexCoordinate;" +
 				"varying vec3 v_Position;" +
 				"varying vec3 v_Normal;" +
                 "varying vec4 v_Color;" +
-				"varying vec2 v_TexCoordinate;" +
 				"void main() {" +
                 "    v_Position = vec3(u_MVMatrix * a_Position);" +
                 "    v_Color = a_Color;" +
-                "    v_TexCoordinate = a_TexCoordinate;" +
                 "    v_Normal = vec3(u_MVMatrix * vec4(a_Normal, 0.0));" +
                 "    gl_Position = u_MVPMatrix * a_Position;" +
 				"}";
@@ -368,30 +290,23 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
         final String fragmentShader = //per_pixel_fragment_shader_tex_and_light.glsl
                 "precision mediump float;" +
                 "uniform vec3 u_LightPos;" +
-                "uniform sampler2D u_Texture;" +
                 "varying vec3 v_Position;" +
                 "varying vec3 v_Normal;" +
                 "varying vec4 v_Color;" +
-                "varying vec2 v_TexCoordinate;" +
                 "void main() {" +
                 "    float distance = length(u_LightPos - v_Position);" +
                 "    vec3 lightVector = normalize(u_LightPos - v_Position);" +
                 "    float diffuse = max(dot(v_Normal, lightVector), 0.0);" +
                 "    diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance)));" +
                 "    diffuse = diffuse + 0.7;" +
-                //"    gl_FragColor = v_Color;" + // to do
-                "    gl_FragColor = (diffuse * texture2D(u_Texture, v_TexCoordinate));" +
+                "    gl_FragColor = (diffuse * v_Color);" +
                 "}";
 
         final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, vertexShader);
 		final int fragmentShaderHandle = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, fragmentShader);		
 		
 		mProgramHandle = ShaderHelper.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle, 
-				new String[] {"a_Position", "a_Normal", "a_Color", "a_TexCoordinate"});
-
-        // Load the texture
-        mBrickDataHandle = TextureHelper.loadTexture(mActivityContext, R.drawable.stone_wall_public_domain);
-        GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
+				new String[] {"a_Position", "a_Normal", "a_Color"});
 
         // Initialize the accumulated rotation matrix
         Matrix.setIdentityM(mAccumulatedRotation, 0);
@@ -419,7 +334,7 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 	@Override
 	public void onDrawFrame(GL10 glUnused) 
 	{
-		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);			        
+		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
         // Set our per-vertex lighting program.
         GLES20.glUseProgram(mProgramHandle);
@@ -427,11 +342,9 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
         // Set program handles for cube drawing.
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgramHandle, "u_MVPMatrix");
         mMVMatrixHandle = GLES20.glGetUniformLocation(mProgramHandle, "u_MVMatrix"); 
-        mTextureUniformHandle = GLES20.glGetUniformLocation(mProgramHandle, "u_Texture");
         mPositionHandle = GLES20.glGetAttribLocation(mProgramHandle, "a_Position");
         mNormalHandle = GLES20.glGetAttribLocation(mProgramHandle, "a_Normal");
         mColorHandle = GLES20.glGetAttribLocation(mProgramHandle, "a_Color");
-        mTextureCoordinateHandle = GLES20.glGetAttribLocation(mProgramHandle, "a_TexCoordinate");
 
         // Draw a cube.
         // Translate the cube into the screen.
@@ -452,7 +365,7 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
         // Rotate the cube taking the overall rotation into account.     	
     	Matrix.multiplyMM(mTemporaryMatrix, 0, mModelMatrix, 0, mAccumulatedRotation, 0);
     	System.arraycopy(mTemporaryMatrix, 0, mModelMatrix, 0, 16);
-        
+
         drawCube();  
 
 	}	
