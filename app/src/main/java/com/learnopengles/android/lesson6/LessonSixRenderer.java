@@ -13,7 +13,6 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
 import com.learnopengles.android.R;
-import com.learnopengles.android.common.RawResourceReader;
 import com.learnopengles.android.common.ShaderHelper;
 import com.learnopengles.android.common.TextureHelper;
 
@@ -92,10 +91,7 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 	
 	/** This is a handle to our cube shading program. */
 	private int mProgramHandle;
-		
-	/** This is a handle to our light point program. */
-	private int mPointProgramHandle;
-	
+
 	/** These are handles to our texture data. */
 	private int mBrickDataHandle;
 	
@@ -272,7 +268,7 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 				1.0f, 0.0f,	
 				
 				// Bottom face 
-				0.0f, 0.0f, 				
+				0.0f, 0.0f,
 				0.0f, 1.0f,
 				1.0f, 0.0f,
 				0.0f, 1.0f,
@@ -331,24 +327,44 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 		// view matrix. In OpenGL 2, we can keep track of these matrices separately if we choose.
 		Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);		
 
-		final String vertexShader = RawResourceReader.readTextFileFromRawResource(mActivityContext, R.raw.per_pixel_vertex_shader_tex_and_light);   		
- 		final String fragmentShader = RawResourceReader.readTextFileFromRawResource(mActivityContext, R.raw.per_pixel_fragment_shader_tex_and_light);			
-		
-		final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, vertexShader);		
+		final String vertexShader = // per_pixel_vertex_shader_tex_and_light.glsl
+				"uniform mat4 u_MVPMatrix;" +
+				"uniform mat4 u_MVMatrix;" +
+				"attribute vec4 a_Position;" +
+				"attribute vec3 a_Normal;" +
+				"attribute vec2 a_TexCoordinate;" +
+				"varying vec3 v_Position;" +
+				"varying vec3 v_Normal;" +
+				"varying vec2 v_TexCoordinate;" +
+				"void main() {" +
+					"v_Position = vec3(u_MVMatrix * a_Position);" +
+					"v_TexCoordinate = a_TexCoordinate;" +
+					"v_Normal = vec3(u_MVMatrix * vec4(a_Normal, 0.0));" +
+					"gl_Position = u_MVPMatrix * a_Position;" +
+				"}";
+
+        final String fragmentShader = //per_pixel_fragment_shader_tex_and_light.glsl
+                "precision mediump float;" +
+                "uniform vec3 u_LightPos;" +
+                "uniform sampler2D u_Texture;" +
+                "varying vec3 v_Position;" +
+                "varying vec3 v_Normal;" +
+                "varying vec2 v_TexCoordinate;" +
+                "void main() {" +
+                    "float distance = length(u_LightPos - v_Position);" +
+                    "vec3 lightVector = normalize(u_LightPos - v_Position);" +
+                    "float diffuse = max(dot(v_Normal, lightVector), 0.0);" +
+                    "diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance)));" +
+                    "diffuse = diffuse + 0.7;" +
+                    "gl_FragColor = (diffuse * texture2D(u_Texture, v_TexCoordinate));" +
+                "}";
+
+        final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, vertexShader);
 		final int fragmentShaderHandle = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, fragmentShader);		
 		
 		mProgramHandle = ShaderHelper.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle, 
 				new String[] {"a_Position",  "a_Normal", "a_TexCoordinate"});								                                							       
-        
-        // Define a simple shader program for our point.
-        final String pointVertexShader = RawResourceReader.readTextFileFromRawResource(mActivityContext, R.raw.point_vertex_shader);        	       
-        final String pointFragmentShader = RawResourceReader.readTextFileFromRawResource(mActivityContext, R.raw.point_fragment_shader);
-        
-        final int pointVertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, pointVertexShader);
-        final int pointFragmentShaderHandle = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, pointFragmentShader);
-        mPointProgramHandle = ShaderHelper.createAndLinkProgram(pointVertexShaderHandle, pointFragmentShaderHandle, 
-        		new String[] {"a_Position"}); 
-        
+
         // Load the texture
         mBrickDataHandle = TextureHelper.loadTexture(mActivityContext, R.drawable.stone_wall_public_domain);        
         GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
@@ -372,8 +388,8 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 		final float top = 1.0f;
 		final float near = 1.0f;
 		final float far = 1000.0f;
-		
-		Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
+
+        Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
 	}	
 
 	@Override
@@ -423,8 +439,8 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
         
         // Pass in the texture coordinate information
         mCubeTextureCoordinates.position(0);
-        GLES20.glVertexAttribPointer(mTextureCoordinateHandle, mTextureCoordinateDataSize, GLES20.GL_FLOAT, false, 
-        		0, mCubeTextureCoordinates);
+        GLES20.glVertexAttribPointer(mTextureCoordinateHandle, mTextureCoordinateDataSize, GLES20.GL_FLOAT, false,
+				0, mCubeTextureCoordinates);
 
         GLES20.glEnableVertexAttribArray(mTextureCoordinateHandle);
         
