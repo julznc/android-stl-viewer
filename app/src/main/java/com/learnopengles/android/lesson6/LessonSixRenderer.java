@@ -101,10 +101,6 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 	/** These are handles to our texture data. */
 	private int mBrickDataHandle;
 	
-	/** Temporary place to save the min and mag filter, in case the activity was restarted. */
-	private int mQueuedMinFilter;
-	private int mQueuedMagFilter;
-	
 	// These still work without volatile, but refreshes are not guaranteed to happen.					
 	public volatile float mDeltaX;					
 	public volatile float mDeltaY;						
@@ -417,17 +413,7 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
         // Load the texture
         mBrickDataHandle = TextureHelper.loadTexture(mActivityContext, R.drawable.stone_wall_public_domain);        
         GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
-        
-        if (mQueuedMinFilter != 0)
-        {
-        	setMinFilter(mQueuedMinFilter);
-        }
-        
-        if (mQueuedMagFilter != 0)
-        {
-        	setMagFilter(mQueuedMagFilter);
-        }
-        
+
         // Initialize the accumulated rotation matrix
         Matrix.setIdentityM(mAccumulatedRotation, 0);
 	}	
@@ -532,33 +518,7 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
         
         drawCube();
 	}	
-	
-	public void setMinFilter(final int filter)
-	{
-		if (mBrickDataHandle != 0)
-		{
-			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mBrickDataHandle);
-			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, filter);
-		}
-		else
-		{
-			mQueuedMinFilter = filter;
-		}
-	}
-	
-	public void setMagFilter(final int filter)
-	{
-		if (mBrickDataHandle != 0)
-		{
-			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mBrickDataHandle);
-			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, filter);
-		}
-		else
-		{
-			mQueuedMagFilter = filter;
-		}
-	}
-	
+
 	/**
 	 * Draws a cube.
 	 */			
