@@ -11,7 +11,6 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
-import android.os.SystemClock;
 
 import com.learnopengles.android.R;
 import com.learnopengles.android.common.RawResourceReader;
@@ -441,13 +440,7 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 	public void onDrawFrame(GL10 glUnused) 
 	{
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);			        
-                
-        // Do a complete rotation every 10 seconds.
-        long time = SystemClock.uptimeMillis() % 10000L;
-        long slowTime = SystemClock.uptimeMillis() % 100000L; 
-        float angleInDegrees = (360.0f / 10000.0f) * ((int) time);
-        float slowAngleInDegrees = (360.0f / 100000.0f) * ((int) slowTime); 
-        
+
         // Set our per-vertex lighting program.
         GLES20.glUseProgram(mProgramHandle);
         
@@ -496,27 +489,7 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
         GLES20.glEnableVertexAttribArray(mTextureCoordinateHandle);
         
         drawCube();  
-        
-        // Draw a plane
-        Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, 0.0f, -2.0f, -5.0f);
-        Matrix.scaleM(mModelMatrix, 0, 25.0f, 1.0f, 25.0f);
-        Matrix.rotateM(mModelMatrix, 0, slowAngleInDegrees, 0.0f, 1.0f, 0.0f);
-        
-        // Set the active texture unit to texture unit 0.
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        
-        // Tell the texture uniform sampler to use this texture in the shader by binding to texture unit 0.
-        GLES20.glUniform1i(mTextureUniformHandle, 0);
-        
-        // Pass in the texture coordinate information
-        mCubeTextureCoordinatesForPlane.position(0);
-        GLES20.glVertexAttribPointer(mTextureCoordinateHandle, mTextureCoordinateDataSize, GLES20.GL_FLOAT, false, 
-        		0, mCubeTextureCoordinatesForPlane);
-        
-        GLES20.glEnableVertexAttribArray(mTextureCoordinateHandle);
-        
-        drawCube();
+
 	}	
 
 	/**
