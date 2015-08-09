@@ -14,8 +14,6 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.learnopengles.android.R;
-import com.learnopengles.android.common.ShaderHelper;
 import com.learnopengles.android.object.STLObject;
 
 /**
@@ -289,11 +287,10 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
                 "    gl_FragColor = (diffuse * u_Color);" +
                 "}";
 
-        final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, vertexShader);
-		final int fragmentShaderHandle = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, fragmentShader);		
-		
-		mProgramHandle = ShaderHelper.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle, 
-				new String[] {"a_Position", "a_Normal", "a_Color"});
+        mProgramHandle = GLES20.glCreateProgram();
+        GLES20.glAttachShader(mProgramHandle, loadShader(GLES20.GL_VERTEX_SHADER, vertexShader));
+        GLES20.glAttachShader(mProgramHandle, loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShader));
+        GLES20.glLinkProgram(mProgramHandle);
 
         // Set program handles for cube drawing.
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgramHandle, "u_MVPMatrix");
@@ -353,51 +350,55 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
         // Set our per-vertex lighting program.
         GLES20.glUseProgram(mProgramHandle);
 
-        drawCube();  
-
+        draw(mModelMatrix, mViewMatrix, mProjectionMatrix);
 	}	
 
-	/**
-	 * Draws a cube.
-	 */			
-	private void drawCube()
-	{		
-		// Pass in the position information
-		mCubePositions.position(0);		
+    public void draw(float[] modelMatrix, float[] viewMatrix, float[] projectionMatrix) {
+        GLES20.glUseProgram(mProgramHandle);
+
+        // Pass in the position information
+        mCubePositions.position(0);
         GLES20.glVertexAttribPointer(mPositionHandle, mPositionDataSize, GLES20.GL_FLOAT, false,
                 0, mCubePositions);
-                
-        GLES20.glEnableVertexAttribArray(mPositionHandle);                       
-        
+
+        GLES20.glEnableVertexAttribArray(mPositionHandle);
+
         // Pass in the normal information
         mCubeNormals.position(0);
         GLES20.glVertexAttribPointer(mNormalHandle, mNormalDataSize, GLES20.GL_FLOAT, false,
                 0, mCubeNormals);
-        
+
         GLES20.glEnableVertexAttribArray(mNormalHandle);
 
         // uniform color
-		GLES20.glUniform4f(mColorHandle, 0.0f, 1.0f, 1.0f, 1.0f); // rgba
-		GLES20.glEnableVertexAttribArray(mColorHandle);
-        
-		// This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
+        GLES20.glUniform4f(mColorHandle, 0.0f, 1.0f, 1.0f, 1.0f); // rgba
+        GLES20.glEnableVertexAttribArray(mColorHandle);
+
+        // This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
         // (which currently contains model * view).
-        Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);   
-        
+        Matrix.multiplyMM(mMVPMatrix, 0, viewMatrix, 0, modelMatrix, 0);
+
         // Pass in the modelview matrix.
-        GLES20.glUniformMatrix4fv(mMVMatrixHandle, 1, false, mMVPMatrix, 0);                
-        
+        GLES20.glUniformMatrix4fv(mMVMatrixHandle, 1, false, mMVPMatrix, 0);
+
         // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
-        // (which now contains model * view * projection).        
-        Matrix.multiplyMM(mTemporaryMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
+        // (which now contains model * view * projection).
+        Matrix.multiplyMM(mTemporaryMatrix, 0, projectionMatrix, 0, mMVPMatrix, 0);
         System.arraycopy(mTemporaryMatrix, 0, mMVPMatrix, 0, 16);
 
         // Pass in the combined matrix.
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
 
         // Draw the cube.
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 36);                               
-	}
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 36);
+    }
+
+    public static int loadShader(int type, String shaderCode) {
+        int shader = GLES20.glCreateShader(type);
+        GLES20.glShaderSource(shader, shaderCode);
+        GLES20.glCompileShader(shader);
+        return shader;
+    }
 
     void loadSTL(File stlfile) {
         Log.e(getClass().getName(), "selected file " + stlfile.toString());

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
-import com.learnopengles.android.common.ShaderHelper;
+import com.learnopengles.android.lesson6.LessonSixRenderer;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -175,11 +175,10 @@ public class STLObject {
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mNormals.put(mNormalData).position(0);
 
-        final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER_CODE);
-        final int fragmentShaderHandle = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER_CODE);
-
-        mProgramHandle = ShaderHelper.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle,
-                new String[] {"a_Position", "a_Normal", "a_Color"});
+        mProgramHandle = GLES20.glCreateProgram();
+        GLES20.glAttachShader(mProgramHandle, LessonSixRenderer.loadShader(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER_CODE));
+        GLES20.glAttachShader(mProgramHandle, LessonSixRenderer.loadShader(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER_CODE));
+        GLES20.glLinkProgram(mProgramHandle);
 
         // Set program handles for drawing.
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgramHandle, "u_MVPMatrix");
@@ -187,6 +186,10 @@ public class STLObject {
         mPositionHandle = GLES20.glGetAttribLocation(mProgramHandle, "a_Position");
         mNormalHandle = GLES20.glGetAttribLocation(mProgramHandle, "a_Normal");
         mColorHandle = GLES20.glGetUniformLocation(mProgramHandle, "u_Color");
+    }
+
+    public int getProgramHandle() {
+        return mProgramHandle;
     }
 
     public void draw(float[] modelMatrix, float[] viewMatrix, float[] projectionMatrix) {
