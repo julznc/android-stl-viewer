@@ -4,8 +4,6 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
-import com.learnopengles.android.lesson6.LessonSixRenderer;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -176,8 +174,8 @@ public class STLObject {
         mNormals.put(mNormalData).position(0);
 
         mProgramHandle = GLES20.glCreateProgram();
-        GLES20.glAttachShader(mProgramHandle, LessonSixRenderer.loadShader(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER_CODE));
-        GLES20.glAttachShader(mProgramHandle, LessonSixRenderer.loadShader(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER_CODE));
+        GLES20.glAttachShader(mProgramHandle, loadShader(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER_CODE));
+        GLES20.glAttachShader(mProgramHandle, loadShader(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER_CODE));
         GLES20.glLinkProgram(mProgramHandle);
 
         // Set program handles for drawing.
@@ -188,8 +186,11 @@ public class STLObject {
         mColorHandle = GLES20.glGetUniformLocation(mProgramHandle, "u_Color");
     }
 
-    public int getProgramHandle() {
-        return mProgramHandle;
+    public static int loadShader(int type, String shaderCode) {
+        int shader = GLES20.glCreateShader(type);
+        GLES20.glShaderSource(shader, shaderCode);
+        GLES20.glCompileShader(shader);
+        return shader;
     }
 
     public void draw(float[] modelMatrix, float[] viewMatrix, float[] projectionMatrix) {
