@@ -1,15 +1,16 @@
 package com.learnopengles.android.object;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 public class STLObject {
-    private final Context mContext;
 
     private final FloatBuffer mPositions;
     private final FloatBuffer mNormals;
@@ -161,8 +162,7 @@ public class STLObject {
             "    gl_FragColor = (diffuse * u_Color);" +
             "}";
 
-    public STLObject(final Context context) {
-        mContext = context;
+    public STLObject() {
 
         // Initialize the buffers.
         mPositions = ByteBuffer.allocateDirect(mPositionData.length * BYTESPERFLOAT)
@@ -230,6 +230,25 @@ public class STLObject {
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
 
         // Draw the cube.
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 36);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mPositionData.length/3);
+    }
+
+    public boolean processSTL(File file, final Context context) {
+        final ProgressDialog progressDialog = prepareProgressDialog(context);
+        return true;
+    }
+
+    private static ProgressDialog prepareProgressDialog(Context context) {
+        ProgressDialog progressDialog = new ProgressDialog(context);
+        progressDialog.setTitle("STL file loading...");
+        progressDialog.setMax(0);
+        progressDialog.setMessage("Please wait a moment.");
+        progressDialog.setIndeterminate(false);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setCancelable(false);
+
+        progressDialog.show();
+
+        return progressDialog;
     }
 }

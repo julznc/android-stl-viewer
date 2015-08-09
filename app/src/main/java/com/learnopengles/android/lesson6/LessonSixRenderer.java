@@ -96,7 +96,7 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 		// Set the view matrix. This matrix can be said to represent the camera position.
 		Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 
-		mStlObj = new STLObject(mActivityContext);
+		mStlObj = new STLObject();
 
         // Initialize the accumulated rotation matrix
         Matrix.setIdentityM(mAccumulatedRotation, 0);
@@ -150,6 +150,7 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 	}
 
     void loadSTL(File stlfile) {
-        Log.e(getClass().getName(), "selected file " + stlfile.toString());
+        Log.d(getClass().getName(), "selected file " + stlfile.toString());
+        mStlObj.processSTL(stlfile, mActivityContext);
     }
 }
