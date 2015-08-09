@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -12,11 +13,15 @@ import android.widget.ImageButton;
 
 import com.learnopengles.android.R;
 
+import java.io.File;
+
 public class LessonSixActivity extends Activity 
 {
 	/** Hold a reference to our GLSurfaceView */
 	private LessonSixGLSurfaceView mGLSurfaceView;
 	private LessonSixRenderer mRenderer;
+
+    private FileDialog mFileDialog;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
@@ -51,11 +56,15 @@ public class LessonSixActivity extends Activity
 			return;
 		}
 
+        File path = new File(Environment.getExternalStorageDirectory() + "//DIR//");
+        mFileDialog = new FileDialog(this, path);
+        mFileDialog.setFileEndsWith(".stl");
+
         final ImageButton loadButton = (ImageButton) findViewById(R.id.loadButton);
         loadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.e("stl viewer", "todo: load stl file");
+                mFileDialog.showDialog();
             }
         });
 	}

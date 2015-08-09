@@ -2,5 +2,5 @@
 <resources>    
     <string name="app_name">Learn OpenGL ES Tutorials</string>
     <string name="toc">Table of Contents</string>
-    <string name="lesson_six">Lesson Six</string>
+    <string name="lesson_six">STL Viewer</string>
 </resources>
