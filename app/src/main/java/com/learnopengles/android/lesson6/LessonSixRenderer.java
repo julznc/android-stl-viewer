@@ -56,7 +56,6 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 	/** Store our model data in a float buffer. */
 	private final FloatBuffer mCubePositions;	
 	private final FloatBuffer mCubeNormals;
-	private final FloatBuffer mCubeColors;
 		
 	/** This will be used to pass in the transformation matrix. */
 	private int mMVPMatrixHandle;
@@ -209,18 +208,6 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 				0.0f, -1.0f, 0.0f
 		};
 
-        // colors
-        final float cubeColorData[] = {
-                0.0f, 1.0f, 1.0f, 1.0f,
-                1.0f, 0.0f, 0.0f, 1.0f,
-                1.0f, 1.0f, 0.0f, 1.0f,
-                0.0f, 1.0f, 0.0f, 1.0f,
-                0.0f, 0.0f, 1.0f, 1.0f,
-                1.0f, 0.0f, 1.0f, 1.0f,
-                1.0f, 1.0f, 1.0f, 1.0f,
-                0.0f, 1.0f, 1.0f, 1.0f,
-        };
-
 		// Initialize the buffers.
 		mCubePositions = ByteBuffer.allocateDirect(cubePositionData.length * mBytesPerFloat)
         .order(ByteOrder.nativeOrder()).asFloatBuffer();							
@@ -229,10 +216,6 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 		mCubeNormals = ByteBuffer.allocateDirect(cubeNormalData.length * mBytesPerFloat)
         .order(ByteOrder.nativeOrder()).asFloatBuffer();							
 		mCubeNormals.put(cubeNormalData).position(0);
-
-        mCubeColors = ByteBuffer.allocateDirect(cubeColorData.length * mBytesPerFloat)
-        .order(ByteOrder.nativeOrder()).asFloatBuffer();
-        mCubeColors.put(cubeColorData).position(0);
 	}
 	
 	@Override
@@ -272,17 +255,15 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 		Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);		
 
 		final String vertexShader = // per_pixel_vertex_shader_tex_and_light.glsl
-				"uniform mat4 u_MVPMatrix;" +
+                "uniform mat4 u_MVPMatrix;" +
 				"uniform mat4 u_MVMatrix;" +
 				"attribute vec4 a_Position;" +
 				"attribute vec3 a_Normal;" +
-                "attribute vec4 a_Color;" +
-				"varying vec3 v_Position;" +
+                "varying vec3 v_Position;" +
 				"varying vec3 v_Normal;" +
                 "varying vec4 v_Color;" +
 				"void main() {" +
                 "    v_Position = vec3(u_MVMatrix * a_Position);" +
-                "    v_Color = a_Color;" +
                 "    v_Normal = vec3(u_MVMatrix * vec4(a_Normal, 0.0));" +
                 "    gl_Position = u_MVPMatrix * a_Position;" +
 				"}";
@@ -292,15 +273,14 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
                 "uniform vec3 u_LightPos;" +
                 "varying vec3 v_Position;" +
                 "varying vec3 v_Normal;" +
-                "varying vec4 v_Color;" +
+                "uniform vec4 u_Color;" +
                 "void main() {" +
                 "    float distance = length(u_LightPos - v_Position);" +
                 "    vec3 lightVector = normalize(u_LightPos - v_Position);" +
                 "    float diffuse = max(dot(v_Normal, lightVector), 0.0);" +
                 "    diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance)));" +
                 "    diffuse = diffuse + 0.7;" +
-                //"    gl_FragColor = (diffuse * v_Color);" +
-                "    gl_FragColor = (diffuse * vec4(0.596, 1.0, 0.596, 1.0));" +
+                "    gl_FragColor = (diffuse * u_Color);" +
                 "}";
 
         final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, vertexShader);
@@ -345,7 +325,7 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
         mMVMatrixHandle = GLES20.glGetUniformLocation(mProgramHandle, "u_MVMatrix"); 
         mPositionHandle = GLES20.glGetAttribLocation(mProgramHandle, "a_Position");
         mNormalHandle = GLES20.glGetAttribLocation(mProgramHandle, "a_Normal");
-        mColorHandle = GLES20.glGetAttribLocation(mProgramHandle, "a_Color");
+        mColorHandle = GLES20.glGetUniformLocation(mProgramHandle, "u_Color");
 
         // Draw a cube.
         // Translate the cube into the screen.
@@ -390,10 +370,9 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
         
         GLES20.glEnableVertexAttribArray(mNormalHandle);
 
-        // Prepare the cube color data.
-        GLES20.glEnableVertexAttribArray(mColorHandle);
-        GLES20.glVertexAttribPointer(
-                mColorHandle, 4, GLES20.GL_FLOAT, false, 4 * mBytesPerFloat, mCubeColors);
+        // uniform color
+		GLES20.glUniform4f(mColorHandle, 0.0f, 1.0f, 1.0f, 1.0f); // rgba
+		GLES20.glEnableVertexAttribArray(mColorHandle);
         
 		// This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
         // (which currently contains model * view).
