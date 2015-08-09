@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 
 import com.learnopengles.android.R;
 
@@ -14,9 +17,6 @@ public class LessonSixActivity extends Activity
 	/** Hold a reference to our GLSurfaceView */
 	private LessonSixGLSurfaceView mGLSurfaceView;
 	private LessonSixRenderer mRenderer;
-	
-	private static final int MIN_DIALOG = 1;
-	private static final int MAG_DIALOG = 2;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
@@ -50,6 +50,14 @@ public class LessonSixActivity extends Activity
 			// renderer if you wanted to support both ES 1 and ES 2.
 			return;
 		}
+
+        final ImageButton loadButton = (ImageButton) findViewById(R.id.loadButton);
+        loadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.e("stl viewer", "todo: load stl file");
+            }
+        });
 	}
 
 	@Override
