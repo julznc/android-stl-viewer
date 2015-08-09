@@ -4,11 +4,16 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.os.AsyncTask;
 
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 public class STLObject {
 
@@ -25,6 +30,8 @@ public class STLObject {
 
     private float[] mMVPMatrix = new float[16];
     private float[] mTemporaryMatrix = new float[16];
+
+    private byte[] stlBytes = null;
 
     private final int BYTESPERFLOAT = 4;
     private final int POSITIONDATASIZE = 3;
@@ -233,8 +240,40 @@ public class STLObject {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mPositionData.length/3);
     }
 
-    public boolean processSTL(File file, final Context context) {
+    public boolean processSTL(final File stlFile, final Context context) {
         final ProgressDialog progressDialog = prepareProgressDialog(context);
+
+        final AsyncTask<File, Integer, List<Float>> task = new AsyncTask<File, Integer, List<Float>>() {
+
+            @Override
+            protected List<Float> doInBackground(File... notused) {
+                try {
+                    stlBytes = new byte[(int)stlFile.length()];
+                    DataInputStream dis = new DataInputStream(new FileInputStream(stlFile));
+                    dis.readFully(stlBytes);
+                } catch (Exception e) {
+
+                }
+                return new ArrayList<>(0);
+            }
+
+            @Override
+            public void onProgressUpdate(Integer... values) {
+                progressDialog.setProgress(values[0]);
+            }
+
+            @Override
+            protected void onPostExecute(List<Float> vertexList) {
+                progressDialog.dismiss();
+            }
+        };
+
+        try {
+            task.execute(stlFile);
+        } catch (Exception e) {
+            return false;
+        }
+
         return true;
     }
 
