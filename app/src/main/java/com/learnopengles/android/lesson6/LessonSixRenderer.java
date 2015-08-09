@@ -295,6 +295,13 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 		mProgramHandle = ShaderHelper.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle, 
 				new String[] {"a_Position", "a_Normal", "a_Color"});
 
+        // Set program handles for cube drawing.
+        mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgramHandle, "u_MVPMatrix");
+        mMVMatrixHandle = GLES20.glGetUniformLocation(mProgramHandle, "u_MVMatrix");
+        mPositionHandle = GLES20.glGetAttribLocation(mProgramHandle, "a_Position");
+        mNormalHandle = GLES20.glGetAttribLocation(mProgramHandle, "a_Normal");
+        mColorHandle = GLES20.glGetUniformLocation(mProgramHandle, "u_Color");
+
         // Initialize the accumulated rotation matrix
         Matrix.setIdentityM(mAccumulatedRotation, 0);
 	}	
@@ -323,16 +330,6 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 	{
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-        // Set our per-vertex lighting program.
-        GLES20.glUseProgram(mProgramHandle);
-        
-        // Set program handles for cube drawing.
-        mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgramHandle, "u_MVPMatrix");
-        mMVMatrixHandle = GLES20.glGetUniformLocation(mProgramHandle, "u_MVMatrix"); 
-        mPositionHandle = GLES20.glGetAttribLocation(mProgramHandle, "a_Position");
-        mNormalHandle = GLES20.glGetAttribLocation(mProgramHandle, "a_Normal");
-        mColorHandle = GLES20.glGetUniformLocation(mProgramHandle, "u_Color");
-
         // Draw a cube.
         // Translate the cube into the screen.
         Matrix.setIdentityM(mModelMatrix, 0);
@@ -352,6 +349,9 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
         // Rotate the cube taking the overall rotation into account.     	
     	Matrix.multiplyMM(mTemporaryMatrix, 0, mModelMatrix, 0, mAccumulatedRotation, 0);
     	System.arraycopy(mTemporaryMatrix, 0, mModelMatrix, 0, 16);
+
+        // Set our per-vertex lighting program.
+        GLES20.glUseProgram(mProgramHandle);
 
         drawCube();  
 
