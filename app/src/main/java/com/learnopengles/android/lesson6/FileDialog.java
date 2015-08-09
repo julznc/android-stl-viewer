@@ -18,10 +18,12 @@ public class FileDialog {
     private String[] fileList;
     private File currentPath;
     private String fileEndsWith;
-    private final Activity activity;
+
     public interface FileSelectedListener {
         void fileSelected(File file);
     }
+    private FileSelectedListener selectListener;
+    private final Activity activity;
 
     public FileDialog(Activity activity, File path) {
         this.activity = activity;
@@ -77,7 +79,7 @@ public class FileDialog {
                     dialog.dismiss();
                     showDialog();
                 } else {
-                    Log.e(getClass().getName(), "selected file " + chosenFile.toString());
+                    selectListener.fileSelected(chosenFile);
                 }
             }
         });
@@ -88,5 +90,9 @@ public class FileDialog {
 
     public void showDialog() {
         createFileDialog().show();
+    }
+
+    public void setFileSelectedListener(FileSelectedListener listener) {
+        selectListener = listener;
     }
 }

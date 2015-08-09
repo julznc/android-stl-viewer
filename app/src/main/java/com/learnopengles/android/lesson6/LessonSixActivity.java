@@ -59,6 +59,11 @@ public class LessonSixActivity extends Activity
         File path = new File(Environment.getExternalStorageDirectory() + "//DIR//");
         mFileDialog = new FileDialog(this, path);
         mFileDialog.setFileEndsWith(".stl");
+        mFileDialog.setFileSelectedListener(new FileDialog.FileSelectedListener() {
+            public void fileSelected(File file) {
+                Log.e(getClass().getName(), "selected file " + file.toString());
+            }
+        });
 
         final ImageButton loadButton = (ImageButton) findViewById(R.id.loadButton);
         loadButton.setOnClickListener(new View.OnClickListener() {
