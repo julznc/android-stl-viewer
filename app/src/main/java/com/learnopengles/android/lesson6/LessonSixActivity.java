@@ -61,7 +61,7 @@ public class LessonSixActivity extends Activity
         mFileDialog.setFileEndsWith(".stl");
         mFileDialog.setFileSelectedListener(new FileDialog.FileSelectedListener() {
             public void fileSelected(File file) {
-                Log.e(getClass().getName(), "selected file " + file.toString());
+                mRenderer.loadSTL(file);
             }
         });
 

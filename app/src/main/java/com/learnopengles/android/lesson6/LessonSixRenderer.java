@@ -1,5 +1,6 @@
 package com.learnopengles.android.lesson6;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -11,9 +12,11 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import com.learnopengles.android.R;
 import com.learnopengles.android.common.ShaderHelper;
+import com.learnopengles.android.object.STLObject;
 
 /**
  * This class implements our custom renderer. Note that the GL10 parameter passed in is unused for OpenGL ES 2.0
@@ -85,7 +88,9 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 
 	// These still work without volatile, but refreshes are not guaranteed to happen.					
 	public volatile float mDeltaX;					
-	public volatile float mDeltaY;						
+	public volatile float mDeltaY;
+
+    private STLObject mStlObj;
 	
 	/**
 	 * Initialize the model data.
@@ -93,6 +98,7 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 	public LessonSixRenderer(final Context activityContext)
 	{	
 		mActivityContext = activityContext;
+        mStlObj = new STLObject(activityContext);
 		
 		// Define points for a cube.		
 		
@@ -392,4 +398,8 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
         // Draw the cube.
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 36);                               
 	}
+
+    void loadSTL(File stlfile) {
+        Log.e(getClass().getName(), "selected file " + stlfile.toString());
+    }
 }
