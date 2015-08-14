@@ -34,6 +34,15 @@ public class STLObject {
     private float[] mTemporaryMatrix = new float[16];
 
     private byte[] stlBytes = null;
+    private List<Float> mVertexList = new ArrayList<Float>();
+    private List<Float> mNormalList = new ArrayList<Float>();
+
+    private float maxX;
+    private float maxY;
+    private float maxZ;
+    private float minX;
+    private float minY;
+    private float minZ;
 
     private final int BYTESPERFLOAT = 4;
     private final int POSITIONDATASIZE = 3;
@@ -243,6 +252,13 @@ public class STLObject {
     }
 
     public boolean processSTL(final File stlFile, final Context context) {
+        maxX = Float.MIN_VALUE;
+        maxY = Float.MIN_VALUE;
+        maxZ = Float.MIN_VALUE;
+        minX = Float.MAX_VALUE;
+        minY = Float.MAX_VALUE;
+        minZ = Float.MAX_VALUE;
+
         final ProgressDialog progressDialog = prepareProgressDialog(context);
 
         final AsyncTask<File, Integer, Integer> task = new AsyncTask<File, Integer, Integer>() {
@@ -280,10 +296,52 @@ public class STLObject {
             }
 
             Integer readASCII() throws Exception {
+                mVertexList.clear();
+                mNormalList.clear();
+
+                String stlText = new String(stlBytes);
+                String[] stlLines = stlText.split("\n");
+                progressDialog.setMax(stlLines.length);
+
+                float nx=0.0f, ny=0.0f, nz=0.0f;
+
+                for (int i = 0; i < stlLines.length; i++) {
+                    String strline = stlLines[i].trim();
+                    if (strline.startsWith("facet normal ")) {
+                        strline = strline.replaceFirst("facet normal ", "");
+                        String[] normalValue = strline.split(" ");
+                        nx = Float.parseFloat(normalValue[0]);
+                        ny = Float.parseFloat(normalValue[1]);
+                        nz = Float.parseFloat(normalValue[2]);
+                    } else if (strline.startsWith("vertex ")) {
+                        strline = strline.replaceFirst("vertex ", "");
+                        String[] vertexValue = strline.split(" ");
+                        float vx = Float.parseFloat(vertexValue[0]);
+                        float vy = Float.parseFloat(vertexValue[1]);
+                        float vz = Float.parseFloat(vertexValue[2]);
+
+                        adjustMaxMin(vx, vy, vz);
+
+                        mVertexList.add(vx);
+                        mVertexList.add(vy);
+                        mVertexList.add(vz);
+
+                        mNormalList.add(nx);
+                        mNormalList.add(ny);
+                        mNormalList.add(nz);
+                    }
+
+                    if (i % (stlLines.length / 50) == 0) {
+                        publishProgress(i);
+                    }
+                }
+
                 return 0;
             }
 
             Integer readBinary() throws Exception {
+                mVertexList.clear();
+                mNormalList.clear();
                 return 0;
             }
 
@@ -320,4 +378,14 @@ public class STLObject {
 
         return progressDialog;
     }
+
+    private void adjustMaxMin(float x, float y, float z) {
+        if (x > maxX) maxX = x;
+        if (y > maxY) maxY = y;
+        if (z > maxZ) maxZ = z;
+        if (x < minX) minX = x;
+        if (y < minY) minY = y;
+        if (z < minZ) minZ = z;
+    }
+
 }
