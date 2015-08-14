@@ -19,8 +19,8 @@ import java.util.List;
 
 public class STLObject {
 
-    private final FloatBuffer mPositions;
-    private final FloatBuffer mNormals;
+    private FloatBuffer mPositions;
+    private FloatBuffer mNormals;
 
     private int mProgramHandle;
 
@@ -49,7 +49,7 @@ public class STLObject {
     private final int NORMALDATASIZE = 3;
 
     // X, Y, Z
-    private final float[] mPositionData =
+    private float[] mPositionData =
         {
                 // Front face
                 -1.0f, 1.0f, 1.0f,
@@ -100,7 +100,7 @@ public class STLObject {
                 -1.0f, -1.0f, -1.0f,
         };
 
-    private final float[] mNormalData =
+    private float[] mNormalData =
         {
                 // Front face
                 0.0f, 0.0f, 1.0f,
@@ -400,6 +400,25 @@ public class STLObject {
 
             @Override
             protected void onPostExecute(Integer result) {
+
+                mPositionData = new float[mVertexList.size()];
+                for (int i=0; i<mVertexList.size(); i++) {
+                    mPositionData[i] = mVertexList.get(i);
+                }
+
+                mNormalData = new float[mNormalList.size()];
+                for (int i=0; i<mNormalList.size(); i++) {
+                    mNormalData[i] = mNormalList.get(i);
+                }
+
+                mPositions = ByteBuffer.allocateDirect(mPositionData.length * BYTESPERFLOAT)
+                        .order(ByteOrder.nativeOrder()).asFloatBuffer();
+                mPositions.put(mPositionData).position(0);
+
+                mNormals = ByteBuffer.allocateDirect(mNormalData.length * BYTESPERFLOAT)
+                        .order(ByteOrder.nativeOrder()).asFloatBuffer();
+                mNormals.put(mNormalData).position(0);
+
                 progressDialog.dismiss();
             }
         };
