@@ -11,7 +11,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.CharBuffer;
 import java.nio.FloatBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -243,18 +245,46 @@ public class STLObject {
     public boolean processSTL(final File stlFile, final Context context) {
         final ProgressDialog progressDialog = prepareProgressDialog(context);
 
-        final AsyncTask<File, Integer, List<Float>> task = new AsyncTask<File, Integer, List<Float>>() {
+        final AsyncTask<File, Integer, Integer> task = new AsyncTask<File, Integer, Integer>() {
 
             @Override
-            protected List<Float> doInBackground(File... notused) {
+            protected Integer doInBackground(File... notused) {
+                Integer result = 0;
                 try {
                     stlBytes = new byte[(int)stlFile.length()];
                     DataInputStream dis = new DataInputStream(new FileInputStream(stlFile));
                     dis.readFully(stlBytes);
-                } catch (Exception e) {
+
+                    // determine if it is ASCII or binary STL
+                    Charset charset = Charset.forName("UTF-8");
+                    CharBuffer decode = charset.decode(ByteBuffer.wrap(stlBytes, 0, 80));
+                    String headerString = decode.toString();
+                    int index = 0;
+                    while(Character.isWhitespace(headerString.charAt(index)) && index < 80) {
+                        index++;
+                    }
+                    String firstWord = headerString.substring(index);
+                    boolean isASCII = (firstWord.toLowerCase().startsWith("solid"));
+
+                    if (isASCII) {
+                        result = readASCII();
+                    } else {
+                        result = readBinary();
+                    }
+
+
+                } catch (Exception ignored) {
 
                 }
-                return new ArrayList<>(0);
+                return result;
+            }
+
+            Integer readASCII() throws Exception {
+                return 0;
+            }
+
+            Integer readBinary() throws Exception {
+                return 0;
             }
 
             @Override
@@ -263,7 +293,7 @@ public class STLObject {
             }
 
             @Override
-            protected void onPostExecute(List<Float> vertexList) {
+            protected void onPostExecute(Integer result) {
                 progressDialog.dismiss();
             }
         };
