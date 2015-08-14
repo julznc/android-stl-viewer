@@ -331,7 +331,7 @@ public class STLObject {
                         mNormalList.add(nz);
                     }
 
-                    if (i % (stlLines.length / 50) == 0) {
+                    if (i % stlLines.length == 0) {
                         publishProgress(i);
                     }
                 }
@@ -342,6 +342,54 @@ public class STLObject {
             Integer readBinary() throws Exception {
                 mVertexList.clear();
                 mNormalList.clear();
+
+                int vectorSize = getIntWithLittleEndian(80);
+                progressDialog.setMax(vectorSize);
+                for (int i = 0; i < vectorSize; i++) {
+                    int offset = i*50;
+                    float nx = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset));
+                    float ny = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 4));
+                    float nz = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 8));
+
+                    float vx = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 12));
+                    float vy = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 16));
+                    float vz = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 20));
+                    adjustMaxMin(vx, vy, vz);
+                    mVertexList.add(vx);
+                    mVertexList.add(vy);
+                    mVertexList.add(vz);
+                    mNormalList.add(nx);
+                    mNormalList.add(ny);
+                    mNormalList.add(nz);
+
+                    vx = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 24));
+                    vy = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 28));
+                    vz = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 32));
+                    adjustMaxMin(vx, vy, vz);
+                    mVertexList.add(vx);
+                    mVertexList.add(vy);
+                    mVertexList.add(vz);
+                    mNormalList.add(nx);
+                    mNormalList.add(ny);
+                    mNormalList.add(nz);
+
+                    vx = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 36));
+                    vy = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 40));
+                    vz = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 44));
+                    adjustMaxMin(vx, vy, vz);
+                    mVertexList.add(vx);
+                    mVertexList.add(vy);
+                    mVertexList.add(vz);
+                    mNormalList.add(nx);
+                    mNormalList.add(ny);
+                    mNormalList.add(nz);
+
+                    if (i % (vectorSize / 50) == 0) {
+                        publishProgress(i);
+                    }
+
+                }
+
                 return 0;
             }
 
@@ -377,6 +425,10 @@ public class STLObject {
         progressDialog.show();
 
         return progressDialog;
+    }
+
+    private int getIntWithLittleEndian(int offset) {
+        return (0xff & stlBytes[offset]) | ((0xff & stlBytes[offset + 1]) << 8) | ((0xff & stlBytes[offset + 2]) << 16) | ((0xff & stlBytes[offset + 3]) << 24);
     }
 
     private void adjustMaxMin(float x, float y, float z) {
