@@ -15,7 +15,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.SimpleAdapter;
 
-import com.ymsoftlabs.stlviewer.LessonSixActivity;
+import com.ymsoftlabs.stlviewer.STLViewerActivity;
 
 public class TableOfContents extends ListActivity 
 {
@@ -41,7 +41,7 @@ public class TableOfContents extends ListActivity
 			item.put(ITEM_IMAGE, R.drawable.ic_lesson_six);
 			item.put(ITEM_TITLE, getText(R.string.lesson_six));
 			data.add(item);
-			activityMapping.put(i++, LessonSixActivity.class);
+			activityMapping.put(i++, STLViewerActivity.class);
 		}
 		
 		final SimpleAdapter dataAdapter = new SimpleAdapter(this, data, R.layout.toc_item, new String[] {ITEM_IMAGE, ITEM_TITLE, ITEM_SUBTITLE}, new int[] {R.id.Image, R.id.Title, R.id.SubTitle});

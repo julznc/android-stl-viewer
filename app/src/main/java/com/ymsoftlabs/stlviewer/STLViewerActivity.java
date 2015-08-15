@@ -15,11 +15,11 @@ import com.ymsoftlabs.stlviewer.R;
 
 import java.io.File;
 
-public class LessonSixActivity extends Activity 
+public class STLViewerActivity extends Activity
 {
 	/** Hold a reference to our GLSurfaceView */
-	private LessonSixGLSurfaceView mGLSurfaceView;
-	private LessonSixRenderer mRenderer;
+	private GLView mGLSurfaceView;
+	private GLRenderer mRenderer;
 
     private FileDialog mFileDialog;
 
@@ -28,9 +28,9 @@ public class LessonSixActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		
-		setContentView(R.layout.lesson_six);
+		setContentView(R.layout.stlviewer_activity);
 
-		mGLSurfaceView = (LessonSixGLSurfaceView)findViewById(R.id.gl_surface_view);
+		mGLSurfaceView = (GLView)findViewById(R.id.gl_surface_view);
 
 		// Check if the system supports OpenGL ES 2.0.
 		final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
@@ -46,7 +46,7 @@ public class LessonSixActivity extends Activity
 			getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
 			// Set the renderer to our demo renderer, defined below.
-			mRenderer = new LessonSixRenderer(this);
+			mRenderer = new GLRenderer(this);
 			mGLSurfaceView.setRenderer(mRenderer, displayMetrics.density);					
 		} 
 		else 

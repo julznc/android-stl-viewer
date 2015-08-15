@@ -7,7 +7,7 @@ import android.opengl.Matrix;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.ymsoftlabs.stlviewer.LessonSixRenderer;
+import com.ymsoftlabs.stlviewer.GLRenderer;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -258,7 +258,7 @@ public class STLObject {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mVertexCount);
     }
 
-    public boolean processSTL(final File stlFile, final Context context, final LessonSixRenderer renderer) {
+    public boolean processSTL(final File stlFile, final Context context, final GLRenderer renderer) {
         mMaxMinXYZ[0] = Float.MIN_VALUE;
         mMaxMinXYZ[1] = Float.MIN_VALUE;
         mMaxMinXYZ[2] = Float.MIN_VALUE;
