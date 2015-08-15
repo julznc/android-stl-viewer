@@ -5,6 +5,9 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.os.AsyncTask;
+import android.util.Log;
+
+import com.learnopengles.android.lesson6.LessonSixRenderer;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -38,12 +41,7 @@ public class STLObject {
     private List<Float> mNormalList = new ArrayList<Float>();
 
     private int mVertexCount = 0;
-    private float maxX;
-    private float maxY;
-    private float maxZ;
-    private float minX;
-    private float minY;
-    private float minZ;
+    private volatile float[] mMaxMinXYZ = new float[6];
 
     private final int BYTESPERFLOAT = 4;
     private final int POSITIONDATASIZE = 3;
@@ -260,13 +258,13 @@ public class STLObject {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mVertexCount);
     }
 
-    public boolean processSTL(final File stlFile, final Context context) {
-        maxX = Float.MIN_VALUE;
-        maxY = Float.MIN_VALUE;
-        maxZ = Float.MIN_VALUE;
-        minX = Float.MAX_VALUE;
-        minY = Float.MAX_VALUE;
-        minZ = Float.MAX_VALUE;
+    public boolean processSTL(final File stlFile, final Context context, final LessonSixRenderer renderer) {
+        mMaxMinXYZ[0] = Float.MIN_VALUE;
+        mMaxMinXYZ[1] = Float.MIN_VALUE;
+        mMaxMinXYZ[2] = Float.MIN_VALUE;
+        mMaxMinXYZ[3] = Float.MAX_VALUE;
+        mMaxMinXYZ[4] = Float.MAX_VALUE;
+        mMaxMinXYZ[5] = Float.MAX_VALUE;
 
         final ProgressDialog progressDialog = prepareProgressDialog(context);
 
@@ -416,6 +414,20 @@ public class STLObject {
             @Override
             protected void onPostExecute(Integer result) {
                 progressDialog.dismiss();
+
+                /*
+                String minmax = String.format("x(%f,%f), y(%f,%f), z(%f,%f)",
+                        mMaxMinXYZ[3], mMaxMinXYZ[0],
+                        mMaxMinXYZ[4], mMaxMinXYZ[1],
+                        mMaxMinXYZ[5], mMaxMinXYZ[2]);
+                Log.d(getClass().getName(), "minmax: " + minmax);
+                */
+                float cX = ( mMaxMinXYZ[0] + mMaxMinXYZ[3] ) / 2;
+                float cY = ( mMaxMinXYZ[1] + mMaxMinXYZ[4] ) / 2;
+                float cZ = ( mMaxMinXYZ[2] + mMaxMinXYZ[5] ) / 2;
+
+                //lookAt(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -5.0f, 0.0f, 1.0f, 0.0f);
+                renderer.lookAt(cX, cY, mMaxMinXYZ[2]*3.0f, 0.0f, 0.0f, cZ, 0.0f, 1.0f, 0.0f);
             }
         };
 
@@ -447,12 +459,13 @@ public class STLObject {
     }
 
     private void adjustMaxMin(float x, float y, float z) {
-        if (x > maxX) maxX = x;
-        if (y > maxY) maxY = y;
-        if (z > maxZ) maxZ = z;
-        if (x < minX) minX = x;
-        if (y < minY) minY = y;
-        if (z < minZ) minZ = z;
+        if (x > mMaxMinXYZ[0]) mMaxMinXYZ[0] = x;
+        if (y > mMaxMinXYZ[1]) mMaxMinXYZ[1] = y;
+        if (z > mMaxMinXYZ[2]) mMaxMinXYZ[2] = z;
+
+        if (x < mMaxMinXYZ[3]) mMaxMinXYZ[3] = x;
+        if (y < mMaxMinXYZ[4]) mMaxMinXYZ[4] = y;
+        if (z < mMaxMinXYZ[5]) mMaxMinXYZ[5] = z;
     }
 
 }

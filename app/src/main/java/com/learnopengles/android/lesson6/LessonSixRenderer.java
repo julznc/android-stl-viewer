@@ -144,6 +144,11 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 
     void loadSTL(File stlFile) {
         Log.d(getClass().getName(), "selected file " + stlFile.toString());
-        mStlObj.processSTL(stlFile, mActivityContext);
+
+        boolean started = mStlObj.processSTL(stlFile, mActivityContext, this);
+        if (started) {
+            // Initialize the accumulated rotation matrix
+            Matrix.setIdentityM(mAccumulatedRotation, 0);
+        }
     }
 }
