@@ -419,9 +419,9 @@ public class STLObject {
                         mMaxMinXYZ[5], mMaxMinXYZ[2]);
                 Log.d(getClass().getName(), "minmax: " + minmax);
                 */
-                float cX = ( mMaxMinXYZ[0] + mMaxMinXYZ[3] ) / 2;
-                float cY = ( mMaxMinXYZ[1] + mMaxMinXYZ[4] ) / 2;
-                float cZ = ( mMaxMinXYZ[2] + mMaxMinXYZ[5] ) / 2;
+                float cX = ( mMaxMinXYZ[0] + mMaxMinXYZ[3] ) * 0.5f;
+                float cY = ( mMaxMinXYZ[1] + mMaxMinXYZ[4] ) * 0.5f;
+                float cZ = ( mMaxMinXYZ[2] + mMaxMinXYZ[5] ) * 0.5f;
 
                 //lookAt(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -5.0f, 0.0f, 1.0f, 0.0f);
                 renderer.lookAt(cX, cY, mMaxMinXYZ[2]*3.0f, 0.0f, 0.0f, cZ, 0.0f, 1.0f, 0.0f);
