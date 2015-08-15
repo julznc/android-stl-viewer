@@ -423,8 +423,8 @@ public class STLObject {
                 float cY = ( mMaxMinXYZ[1] + mMaxMinXYZ[4] ) * 0.5f;
                 float cZ = ( mMaxMinXYZ[2] + mMaxMinXYZ[5] ) * 0.5f;
 
-                //lookAt(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -5.0f, 0.0f, 1.0f, 0.0f);
-                renderer.lookAt(cX, cY, mMaxMinXYZ[2]*3.0f, 0.0f, 0.0f, cZ, 0.0f, 1.0f, 0.0f);
+                //lookAt(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -5.0f);
+                renderer.lookAt(cX, cY, mMaxMinXYZ[2]*3.0f, 0.0f, 0.0f, 0.0f);
             }
         };
 

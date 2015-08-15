@@ -63,7 +63,7 @@ public class GLRenderer implements GLSurfaceView.Renderer
         // Initialize the accumulated rotation matrix
         Matrix.setIdentityM(mAccumulatedRotation, 0);
 
-        lookAt(0.0f, 0.0f, -0.5f, 0.0f, 0.0f, -5.0f, 0.0f, 1.0f, 0.0f);
+        lookAt(0.0f, 0.0f, 2.0f, 0.0f, 0.0f, -2.0f);
 	}
 	
 	@Override
@@ -95,7 +95,7 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		final float bottom = -1.0f;
 		final float top = 1.0f;
 		final float near = 1.0f;
-		final float far = 1000.0f;
+		final float far = 5000.0f;
 
         Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
 	}	
@@ -108,7 +108,7 @@ public class GLRenderer implements GLSurfaceView.Renderer
         // Draw the object.
         // Translate the cube into the screen.
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, 0.0f, 0.8f, -3.5f);     
+        Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, -4.0f);
         
         // Set a matrix that contains the current rotation.
         Matrix.setIdentityM(mCurrentRotation, 0);        
@@ -128,25 +128,24 @@ public class GLRenderer implements GLSurfaceView.Renderer
         mStlObj.draw(mModelMatrix, mViewMatrix, mProjectionMatrix);
 	}
 
-    public void lookAt(
-            // Position the eye in front of the origin.
-            float eyeX, float eyeY, float eyeZ,
-            // We are looking toward the distance
-            float lookX, float lookY, float lookZ,
-            // Set our up vector. This is where our head would be pointing were we holding the camera.
-            float upX, float upY, float upZ )
+    public void lookAt( float eyeX, float eyeY, float eyeZ, float lookX, float lookY, float lookZ )
     {
         // Set the view matrix. This matrix can be said to represent the camera position.
-        Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
+        Matrix.setLookAtM(mViewMatrix, 0,
+                // Position the eye in front of the origin.
+				eyeX, eyeY, eyeZ,
+                // We are looking toward the distance
+                lookX, lookY, lookZ,
+                // Set our up vector. This is where our head would be pointing were we holding the camera.
+                0.0f, 1.0f, 0.0f ); //upX, upY, upZ);
     }
 
     void loadSTL(File stlFile) {
         Log.d(getClass().getName(), "selected file " + stlFile.toString());
 
-        boolean started = mStlObj.processSTL(stlFile, mActivityContext, this);
-        if (started) {
-            // Initialize the accumulated rotation matrix
-            Matrix.setIdentityM(mAccumulatedRotation, 0);
-        }
+        mStlObj.processSTL(stlFile, mActivityContext, this);
+
+        // Initialize the accumulated rotation matrix
+        Matrix.setIdentityM(mAccumulatedRotation, 0);
     }
 }
