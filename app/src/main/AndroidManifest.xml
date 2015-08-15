@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="LessonSixActivity"
+            android:name="STLViewerActivity"
             android:label="@string/lesson_six" />
 
     </application>

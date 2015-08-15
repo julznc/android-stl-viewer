@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Environment;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FilenameFilter;

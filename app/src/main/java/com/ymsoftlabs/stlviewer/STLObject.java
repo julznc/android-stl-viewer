@@ -5,9 +5,6 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.os.AsyncTask;
-import android.util.Log;
-
-import com.ymsoftlabs.stlviewer.GLRenderer;
 
 import java.io.DataInputStream;
 import java.io.File;

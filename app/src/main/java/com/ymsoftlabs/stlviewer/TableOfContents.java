@@ -15,7 +15,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.SimpleAdapter;
 
-import com.ymsoftlabs.stlviewer.STLViewerActivity;
 
 public class TableOfContents extends ListActivity 
 {

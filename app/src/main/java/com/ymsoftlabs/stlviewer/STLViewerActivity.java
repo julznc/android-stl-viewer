@@ -11,8 +11,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
-import com.ymsoftlabs.stlviewer.R;
-
 import java.io.File;
 
 public class STLViewerActivity extends Activity
