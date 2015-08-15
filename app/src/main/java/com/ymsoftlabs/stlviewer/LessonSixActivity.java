@@ -1,4 +1,4 @@
-package com.learnopengles.android.lesson6;
+package com.ymsoftlabs.stlviewer;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -11,7 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
-import com.learnopengles.android.R;
+import com.ymsoftlabs.stlviewer.R;
 
 import java.io.File;
 

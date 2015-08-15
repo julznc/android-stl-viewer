@@ -1,4 +1,4 @@
-package com.learnopengles.android.object;
+package com.ymsoftlabs.stlviewer;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -7,7 +7,7 @@ import android.opengl.Matrix;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.learnopengles.android.lesson6.LessonSixRenderer;
+import com.ymsoftlabs.stlviewer.LessonSixRenderer;
 
 import java.io.DataInputStream;
 import java.io.File;

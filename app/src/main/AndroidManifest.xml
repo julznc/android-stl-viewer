@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.learnopengles.android"
+    package="com.ymsoftlabs.stlviewer"
     android:versionCode="12"
     android:versionName="0.0.0.1" >
 
@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".lesson6.LessonSixActivity"
+            android:name="LessonSixActivity"
             android:label="@string/lesson_six" />
 
     </application>

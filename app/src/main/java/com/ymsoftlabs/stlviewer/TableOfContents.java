@@ -1,4 +1,4 @@
-package com.learnopengles.android;
+package com.ymsoftlabs.stlviewer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.SimpleAdapter;
 
-import com.learnopengles.android.lesson6.LessonSixActivity;
+import com.ymsoftlabs.stlviewer.LessonSixActivity;
 
 public class TableOfContents extends ListActivity 
 {

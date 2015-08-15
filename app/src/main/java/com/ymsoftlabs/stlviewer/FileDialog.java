@@ -1,4 +1,4 @@
-package com.learnopengles.android.lesson6;
+package com.ymsoftlabs.stlviewer;
 
 import android.app.Activity;
 import android.app.AlertDialog;

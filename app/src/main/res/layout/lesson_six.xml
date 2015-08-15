@@ -5,7 +5,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <com.learnopengles.android.lesson6.LessonSixGLSurfaceView
+        <com.ymsoftlabs.stlviewer.LessonSixGLSurfaceView
             android:id="@+id/gl_surface_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

@@ -1,4 +1,4 @@
-package com.learnopengles.android.lesson6;
+package com.ymsoftlabs.stlviewer;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;

@@ -1,4 +1,4 @@
-package com.learnopengles.android.lesson6;
+package com.ymsoftlabs.stlviewer;
 
 import java.io.File;
 
@@ -11,7 +11,7 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.learnopengles.android.object.STLObject;
+import com.ymsoftlabs.stlviewer.STLObject;
 
 /**
  * This class implements our custom renderer. Note that the GL10 parameter passed in is unused for OpenGL ES 2.0
