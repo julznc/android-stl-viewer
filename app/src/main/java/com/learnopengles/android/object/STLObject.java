@@ -311,20 +311,20 @@ public class STLObject {
                 String[] stlLines = stlText.split("\n");
                 progressDialog.setMax(stlLines.length);
 
-                int nvertex = 0;
+                int vertexCount = 0;
                 float nx=0.0f, ny=0.0f, nz=0.0f;
 
                 for (int i = 0; i < stlLines.length; i++) {
-                    String strline = stlLines[i].trim();
-                    if (strline.startsWith("facet normal ")) {
-                        strline = strline.replaceFirst("facet normal ", "");
-                        String[] normalValue = strline.split(" ");
+                    String strLine = stlLines[i].trim();
+                    if (strLine.startsWith("facet normal ")) {
+                        strLine = strLine.replaceFirst("facet normal ", "");
+                        String[] normalValue = strLine.split(" ");
                         nx = Float.parseFloat(normalValue[0]);
                         ny = Float.parseFloat(normalValue[1]);
                         nz = Float.parseFloat(normalValue[2]);
-                    } else if (strline.startsWith("vertex ")) {
-                        strline = strline.replaceFirst("vertex ", "");
-                        String[] vertexValue = strline.split(" ");
+                    } else if (strLine.startsWith("vertex ")) {
+                        strLine = strLine.replaceFirst("vertex ", "");
+                        String[] vertexValue = strLine.split(" ");
                         float vx = Float.parseFloat(vertexValue[0]);
                         float vy = Float.parseFloat(vertexValue[1]);
                         float vz = Float.parseFloat(vertexValue[2]);
@@ -334,7 +334,7 @@ public class STLObject {
                         mVertexList.add(vx);
                         mVertexList.add(vy);
                         mVertexList.add(vz);
-                        ++nvertex;
+                        ++vertexCount;
                         mNormalList.add(nx);
                         mNormalList.add(ny);
                         mNormalList.add(nz);
@@ -345,62 +345,42 @@ public class STLObject {
                     }
                 }
 
-                return nvertex;
+                return vertexCount;
             }
 
             Integer readBinary() throws Exception {
-                int vectorSize = getIntWithLittleEndian(80);
-                int nvertex = 0;
-                progressDialog.setMax(vectorSize);
-                for (int i = 0; i < vectorSize; i++) {
-                    int offset = i*50;
-                    float nx = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset));
-                    float ny = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 4));
-                    float nz = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 8));
+                int totalTriangles = getIntWithLittleEndian(80);
+                int vertexCount = 0;
+                progressDialog.setMax(totalTriangles);
+                int offset = 80 +4;
+                for (int i = 0; i < totalTriangles; i++) {
+                    float nx = Float.intBitsToFloat(getIntWithLittleEndian(offset)); offset += 4;
+                    float ny = Float.intBitsToFloat(getIntWithLittleEndian(offset)); offset += 4;
+                    float nz = Float.intBitsToFloat(getIntWithLittleEndian(offset)); offset += 4;
 
-                    float vx = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 12));
-                    float vy = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 16));
-                    float vz = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 20));
-                    adjustMaxMin(vx, vy, vz);
-                    mVertexList.add(vx);
-                    mVertexList.add(vy);
-                    mVertexList.add(vz);
-                    ++nvertex;
-                    mNormalList.add(nx);
-                    mNormalList.add(ny);
-                    mNormalList.add(nz);
+                    for (int v = 0; v < 3; ++v) {
+                        float vx = Float.intBitsToFloat(getIntWithLittleEndian(offset)); offset += 4;
+                        float vy = Float.intBitsToFloat(getIntWithLittleEndian(offset)); offset += 4;
+                        float vz = Float.intBitsToFloat(getIntWithLittleEndian(offset)); offset += 4;
+                        adjustMaxMin(vx, vy, vz);
+                        mVertexList.add(vx);
+                        mVertexList.add(vy);
+                        mVertexList.add(vz);
+                        ++vertexCount;
+                        mNormalList.add(nx);
+                        mNormalList.add(ny);
+                        mNormalList.add(nz);
+                    }
 
-                    vx = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 24));
-                    vy = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 28));
-                    vz = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 32));
-                    adjustMaxMin(vx, vy, vz);
-                    mVertexList.add(vx);
-                    mVertexList.add(vy);
-                    mVertexList.add(vz);
-                    ++nvertex;
-                    mNormalList.add(nx);
-                    mNormalList.add(ny);
-                    mNormalList.add(nz);
+                    offset += 2;
 
-                    vx = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 36));
-                    vy = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 40));
-                    vz = Float.intBitsToFloat(getIntWithLittleEndian(84 + offset + 44));
-                    adjustMaxMin(vx, vy, vz);
-                    mVertexList.add(vx);
-                    mVertexList.add(vy);
-                    mVertexList.add(vz);
-                    ++nvertex;
-                    mNormalList.add(nx);
-                    mNormalList.add(ny);
-                    mNormalList.add(nz);
-
-                    if (i % (vectorSize / 50) == 0) {
+                    if (i % (totalTriangles>>5) == 0) {
                         publishProgress(i);
                     }
 
                 }
 
-                return nvertex;
+                return vertexCount;
             }
 
             @Override
