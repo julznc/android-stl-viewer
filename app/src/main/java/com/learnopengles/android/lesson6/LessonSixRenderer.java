@@ -58,8 +58,12 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 	 * Initialize the model data.
 	 */
 	public LessonSixRenderer(final Context activityContext)
-	{	
+	{
 		mActivityContext = activityContext;
+        mStlObj = new STLObject();
+
+        // Initialize the accumulated rotation matrix
+        Matrix.setIdentityM(mAccumulatedRotation, 0);
 	}
 	
 	@Override
@@ -92,10 +96,7 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 		// Set the view matrix. This matrix can be said to represent the camera position.
 		Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 
-		mStlObj = new STLObject();
-
-        // Initialize the accumulated rotation matrix
-        Matrix.setIdentityM(mAccumulatedRotation, 0);
+        mStlObj.loadHandles();
 	}	
 		
 	@Override

@@ -193,6 +193,9 @@ public class STLObject {
         mNormals.put(mNormalData).position(0);
 
         mVertexCount = mPositionData.length / 3;
+    }
+
+    public void loadHandles() {
 
         mProgramHandle = GLES20.glCreateProgram();
         GLES20.glAttachShader(mProgramHandle, loadShader(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER_CODE));
@@ -271,10 +274,10 @@ public class STLObject {
 
             @Override
             protected Integer doInBackground(File... notused) {
-                int nvertex = 0;
                 mVertexList.clear();
                 mNormalList.clear();
                 mVertexCount = 0;
+                int vertexCount;
                 try {
                     stlBytes = new byte[(int)stlFile.length()];
                     DataInputStream dis = new DataInputStream(new FileInputStream(stlFile));
@@ -292,17 +295,39 @@ public class STLObject {
                     boolean isASCII = (firstWord.toLowerCase().startsWith("solid"));
 
                     if (isASCII) {
-                        nvertex = readASCII();
+                        vertexCount = readASCII();
                     } else {
-                        nvertex = readBinary();
+                        vertexCount = readBinary();
                     }
 
 
                 } catch (Exception ignored) {
-                    nvertex = 0;
+                    vertexCount = 0;
                 }
-                mVertexCount = nvertex;
-                return nvertex;
+
+                if ( vertexCount > 2 ) {
+                    mPositionData = new float[mVertexList.size()];
+                    for (int i=0; i<mVertexList.size(); i++) {
+                        mPositionData[i] = mVertexList.get(i);
+                    }
+
+                    mNormalData = new float[mNormalList.size()];
+                    for (int i=0; i<mNormalList.size(); i++) {
+                        mNormalData[i] = mNormalList.get(i);
+                    }
+
+                    mPositions = ByteBuffer.allocateDirect(mPositionData.length * BYTESPERFLOAT)
+                            .order(ByteOrder.nativeOrder()).asFloatBuffer();
+                    mPositions.put(mPositionData).position(0);
+
+                    mNormals = ByteBuffer.allocateDirect(mNormalData.length * BYTESPERFLOAT)
+                            .order(ByteOrder.nativeOrder()).asFloatBuffer();
+                    mNormals.put(mNormalData).position(0);
+
+                    mVertexCount = vertexCount;
+
+                }
+                return vertexCount;
             }
 
             Integer readASCII() throws Exception {
@@ -390,25 +415,6 @@ public class STLObject {
 
             @Override
             protected void onPostExecute(Integer result) {
-
-                mPositionData = new float[mVertexList.size()];
-                for (int i=0; i<mVertexList.size(); i++) {
-                    mPositionData[i] = mVertexList.get(i);
-                }
-
-                mNormalData = new float[mNormalList.size()];
-                for (int i=0; i<mNormalList.size(); i++) {
-                    mNormalData[i] = mNormalList.get(i);
-                }
-
-                mPositions = ByteBuffer.allocateDirect(mPositionData.length * BYTESPERFLOAT)
-                        .order(ByteOrder.nativeOrder()).asFloatBuffer();
-                mPositions.put(mPositionData).position(0);
-
-                mNormals = ByteBuffer.allocateDirect(mNormalData.length * BYTESPERFLOAT)
-                        .order(ByteOrder.nativeOrder()).asFloatBuffer();
-                mNormals.put(mNormalData).position(0);
-
                 progressDialog.dismiss();
             }
         };
