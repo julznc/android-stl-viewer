@@ -37,6 +37,7 @@ public class STLObject {
     private List<Float> mVertexList = new ArrayList<Float>();
     private List<Float> mNormalList = new ArrayList<Float>();
 
+    private int mVertexCount = 0;
     private float maxX;
     private float maxY;
     private float maxZ;
@@ -191,6 +192,8 @@ public class STLObject {
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mNormals.put(mNormalData).position(0);
 
+        mVertexCount = mPositionData.length / 3;
+
         mProgramHandle = GLES20.glCreateProgram();
         GLES20.glAttachShader(mProgramHandle, loadShader(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER_CODE));
         GLES20.glAttachShader(mProgramHandle, loadShader(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER_CODE));
@@ -212,6 +215,9 @@ public class STLObject {
     }
 
     public void draw(float[] modelMatrix, float[] viewMatrix, float[] projectionMatrix) {
+        if (mVertexCount < 3)
+            return;
+
         GLES20.glUseProgram(mProgramHandle);
 
         // Pass in the position information
@@ -248,7 +254,7 @@ public class STLObject {
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
 
         // Draw the cube.
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mPositionData.length/3);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mVertexCount);
     }
 
     public boolean processSTL(final File stlFile, final Context context) {
@@ -265,7 +271,10 @@ public class STLObject {
 
             @Override
             protected Integer doInBackground(File... notused) {
-                Integer result = 0;
+                int nvertex = 0;
+                mVertexList.clear();
+                mNormalList.clear();
+                mVertexCount = 0;
                 try {
                     stlBytes = new byte[(int)stlFile.length()];
                     DataInputStream dis = new DataInputStream(new FileInputStream(stlFile));
@@ -283,26 +292,26 @@ public class STLObject {
                     boolean isASCII = (firstWord.toLowerCase().startsWith("solid"));
 
                     if (isASCII) {
-                        result = readASCII();
+                        nvertex = readASCII();
                     } else {
-                        result = readBinary();
+                        nvertex = readBinary();
                     }
 
 
                 } catch (Exception ignored) {
-
+                    nvertex = 0;
                 }
-                return result;
+                mVertexCount = nvertex;
+                return nvertex;
             }
 
             Integer readASCII() throws Exception {
-                mVertexList.clear();
-                mNormalList.clear();
 
                 String stlText = new String(stlBytes);
                 String[] stlLines = stlText.split("\n");
                 progressDialog.setMax(stlLines.length);
 
+                int nvertex = 0;
                 float nx=0.0f, ny=0.0f, nz=0.0f;
 
                 for (int i = 0; i < stlLines.length; i++) {
@@ -325,7 +334,7 @@ public class STLObject {
                         mVertexList.add(vx);
                         mVertexList.add(vy);
                         mVertexList.add(vz);
-
+                        ++nvertex;
                         mNormalList.add(nx);
                         mNormalList.add(ny);
                         mNormalList.add(nz);
@@ -336,14 +345,12 @@ public class STLObject {
                     }
                 }
 
-                return 0;
+                return nvertex;
             }
 
             Integer readBinary() throws Exception {
-                mVertexList.clear();
-                mNormalList.clear();
-
                 int vectorSize = getIntWithLittleEndian(80);
+                int nvertex = 0;
                 progressDialog.setMax(vectorSize);
                 for (int i = 0; i < vectorSize; i++) {
                     int offset = i*50;
@@ -358,6 +365,7 @@ public class STLObject {
                     mVertexList.add(vx);
                     mVertexList.add(vy);
                     mVertexList.add(vz);
+                    ++nvertex;
                     mNormalList.add(nx);
                     mNormalList.add(ny);
                     mNormalList.add(nz);
@@ -369,6 +377,7 @@ public class STLObject {
                     mVertexList.add(vx);
                     mVertexList.add(vy);
                     mVertexList.add(vz);
+                    ++nvertex;
                     mNormalList.add(nx);
                     mNormalList.add(ny);
                     mNormalList.add(nz);
@@ -380,6 +389,7 @@ public class STLObject {
                     mVertexList.add(vx);
                     mVertexList.add(vy);
                     mVertexList.add(vz);
+                    ++nvertex;
                     mNormalList.add(nx);
                     mNormalList.add(ny);
                     mNormalList.add(nz);
@@ -390,7 +400,7 @@ public class STLObject {
 
                 }
 
-                return 0;
+                return nvertex;
             }
 
             @Override
