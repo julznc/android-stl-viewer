@@ -73,7 +73,7 @@ public class LessonSixRenderer implements GLSurfaceView.Renderer
 		
 		// Enable depth testing
 		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-		
+
 		// Position the eye in front of the origin.
 		final float eyeX = 0.0f;
 		final float eyeY = 0.0f;
